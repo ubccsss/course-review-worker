@@ -1,0 +1,23 @@
+name = "githubissues-dev"
+type = "webpack"
+
+account_id = "f8ffb577efdf82b0303f86d7b4ca94a5"
+workers_dev = true
+route = ""
+zone_id = ""
+compatibility_date = "2022-01-10"
+
+[vars]
+OWNER = "csssbot"
+REPO = "testing"
+LABELS = "test,octokit"
+ORIGIN = "*"
+
+[env.production]
+name = "githubissues"
+
+[env.production.vars]
+OWNER = "ubccsss"
+REPO = "ubccsss.org"
+LABELS = "course review"
+ORIGIN = "https://ubccsss.org"

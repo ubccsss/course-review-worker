@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "ubccsss-github-worker",
+  "version": "1.0.0",
+  "description": "A template for kick starting a Cloudflare Workers project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write '**/*.{js,css,json,md}'"
+  },
+  "author": "Asad Dhorajiwala",
+  "devDependencies": {
+    "@cloudflare/wrangler": "^1.19.7",
+    "prettier": "^1.18.2"
+  },
+  "dependencies": {
+    "@octokit/rest": "^18.12.0"
+  }
+}
