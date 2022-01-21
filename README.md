@@ -31,6 +31,6 @@ Publishing the worker to Cloudflare:
 $ wrangler publish  # publishes dev environment
 $ wrangler publish --env production  # publishes production environment
 ```
-Further documentation for Cloudflare workers can be found [here](https://developers.cloudflare.com/workers).
+Further documentation on Cloudflare workers can be found [here](https://developers.cloudflare.com/workers).
 
-Further documentation for Wrangler can be found [here](https://developers.cloudflare.com/workers/cli-wrangler).
+Further documentation on Wrangler can be found [here](https://developers.cloudflare.com/workers/cli-wrangler).
