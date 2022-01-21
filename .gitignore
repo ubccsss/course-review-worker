@@ -9,3 +9,5 @@ worker/
 node_modules/
 .cargo-ok
 .env
+.idea
+.vscode
