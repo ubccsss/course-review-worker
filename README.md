@@ -8,7 +8,7 @@ A Cloudflare worker for creating GitHub issues for new course reviews for [ubccs
 $ git clone
 $ cd github-issues-worker
 $ npm install
-$ npm i @cloudflare/wrangler -g  # optional
+$ npm i @cloudflare/wrangler -g
 $ wrangler login  # select y to login via browser
 ```
 
