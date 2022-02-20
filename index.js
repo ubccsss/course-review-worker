@@ -76,8 +76,8 @@ async function handleRequest(request) {
     })
   }
 
-  // verify recaptcha token
-  if (verifyToken(json.recaptchaToken) === false) {
+  // verify reCAPTCHA token
+  if (verifyToken(json.recaptcha.token) === false) {
     return new Response('Invalid reCAPTCHA token', {
       status: 400,
       statusText: 'Bad Request',
@@ -108,19 +108,23 @@ async function handleRequest(request) {
 }
 
 /**
- * Verifies the recaptcha token with Google.
+ * Verifies the reCAPTCHA token with Google.
  * @param {string} token
  */
 async function verifyToken(token) {
-  // add URL params
-  const url = new URL('https://www.google.com/recaptcha/api/siteverify')
-  url.searchParams.append('secret', RECAPTCHA_SECRET)
-  url.searchParams.append('response', token)
+  try {
+    // add URL params
+    const url = new URL('https://www.google.com/recaptcha/api/siteverify')
+    url.searchParams.append('secret', RECAPTCHA_SECRET_KEY)
+    url.searchParams.append('response', token)
 
-  // return verification result
-  const response = await fetch(url, {
-    method: 'POST',
-  })
-  const json = await response.json()
-  return json.success
+    // return verification result
+    const response = await fetch(url, {
+      method: 'POST',
+    })
+    const json = await response.json()
+    return json.success
+  } catch (e) {
+    return false
+  }
 }
