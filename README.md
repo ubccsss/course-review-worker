@@ -12,6 +12,13 @@ $ npm i @cloudflare/wrangler -g
 $ wrangler login  # select y to login via browser
 ```
 
+## Secrets
+
+- ACCESS_TOKEN - GitHub access token
+- RECAPTCHA_SECRET_KEY - Google reCAPTCHA secret key
+
+Secrets can be managed using [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/commands#secret) or using the [Cloudflare dashboard](https://dash.cloudflare.com).
+
 ## Contributing
 
 [`index.js`](index.js) contains the Worker's script.
@@ -21,7 +28,7 @@ $ wrangler login  # select y to login via browser
 Running the worker locally:
 
 ```bash
-$ wranger dev  # runs dev environment
+$ wrangler dev  # runs dev environment
 $ wrangler dev --env production  # runs production envirnment
 ```
 
@@ -31,6 +38,7 @@ Publishing the worker to Cloudflare:
 $ wrangler publish  # publishes dev environment
 $ wrangler publish --env production  # publishes production environment
 ```
+
 Further documentation on Cloudflare workers can be found [here](https://developers.cloudflare.com/workers).
 
 Further documentation on Wrangler can be found [here](https://developers.cloudflare.com/workers/cli-wrangler).
