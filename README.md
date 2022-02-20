@@ -14,8 +14,8 @@ $ wrangler login  # select y to login via browser
 
 ## Secrets
 
-- ACCESS_TOKEN - GitHub access token
-- RECAPTCHA_SECRET_KEY - Google reCAPTCHA secret key
+- `ACCESS_TOKEN` - [GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+- `RECAPTCHA_SECRET_KEY` - [Google reCAPTCHA secret key](https://developers.google.com/recaptcha/intro)
 
 Secrets can be managed using [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/commands#secret) or using the [Cloudflare dashboard](https://dash.cloudflare.com).
 
