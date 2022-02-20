@@ -76,7 +76,17 @@ async function handleRequest(request) {
     })
   }
 
-  const { course, user, review, reference } = json
+  // verify recaptcha token
+  if (verifyToken(json.recaptchaToken) === false) {
+    return new Response('Invalid reCAPTCHA token', {
+      status: 400,
+      statusText: 'Bad Request',
+      headers: corsHeaders,
+    })
+  }
+
+  // create issue
+  const { course, user, review, reference } = json.details
 
   const title = `New review for ${course} by ${user}`
   const body = `> ${review}\n> \n> [${user}](${reference})`
@@ -95,4 +105,22 @@ async function handleRequest(request) {
       ...corsHeaders,
     },
   })
+}
+
+/**
+ * Verifies the recaptcha token with Google.
+ * @param {string} token
+ */
+async function verifyToken(token) {
+  // add URL params
+  const url = new URL('https://www.google.com/recaptcha/api/siteverify')
+  url.searchParams.append('secret', RECAPTCHA_SECRET)
+  url.searchParams.append('response', token)
+
+  // return verification result
+  const response = await fetch(url, {
+    method: 'POST',
+  })
+  const json = await response.json()
+  return json.success
 }
