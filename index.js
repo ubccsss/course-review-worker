@@ -77,8 +77,11 @@ async function handleRequest(request) {
   }
 
   // verify reCAPTCHA token
-  if (verifyToken(json.recaptcha.token) === false) {
-    return new Response('Invalid reCAPTCHA token', {
+  const { success, errors } = await verifyToken(json.token)
+
+  // return error response if reCAPTCHA token is invalid
+  if (!success) {
+    return new Response(JSON.stringify({ errors }), {
       status: 400,
       statusText: 'Bad Request',
       headers: corsHeaders,
@@ -101,6 +104,8 @@ async function handleRequest(request) {
 
   return new Response(JSON.stringify(response), {
     headers: {
+      status: 201,
+      statusText: 'Created',
       'Content-Type': 'application/json',
       ...corsHeaders,
     },
@@ -109,6 +114,9 @@ async function handleRequest(request) {
 
 /**
  * Verifies the reCAPTCHA token with Google.
+ * Returns a promise that resolves to an object with the following properties:
+ * - success: boolean
+ * - errors: array of error messages
  * @param {string} token
  */
 async function verifyToken(token) {
@@ -123,8 +131,8 @@ async function verifyToken(token) {
       method: 'POST',
     })
     const json = await response.json()
-    return json.success
+    return { success: json.success, errors: json['error-codes'] }
   } catch (e) {
-    return false
+    return { success: false, errors: ['JSON parse failure'] }
   }
 }
