@@ -77,7 +77,7 @@ async function handleRequest(request) {
   }
 
   // verify reCAPTCHA token
-  const { success, errors } = await verifyToken(json.token)
+  const { success, errors } = await verifyToken(json.recaptcha.token)
 
   // return error response if reCAPTCHA token is invalid
   if (!success) {
@@ -102,7 +102,7 @@ async function handleRequest(request) {
     labels: LABELS.split(','),
   })
 
-  return new Response(JSON.stringify(response), {
+  return new Response(JSON.stringify({ url: response.data.html_url }), {
     headers: {
       status: 201,
       statusText: 'Created',
@@ -114,14 +114,12 @@ async function handleRequest(request) {
 
 /**
  * Verifies the reCAPTCHA token with Google.
- * Returns a promise that resolves to an object with the following properties:
- * - success: boolean
- * - errors: array of error messages
  * @param {string} token
  */
 async function verifyToken(token) {
   try {
     // add URL params
+    console.log(token)
     const url = new URL('https://www.google.com/recaptcha/api/siteverify')
     url.searchParams.append('secret', RECAPTCHA_SECRET_KEY)
     url.searchParams.append('response', token)
