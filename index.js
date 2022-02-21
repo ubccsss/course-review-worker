@@ -119,7 +119,6 @@ async function handleRequest(request) {
 async function verifyToken(token) {
   try {
     // add URL params
-    console.log(token)
     const url = new URL('https://www.google.com/recaptcha/api/siteverify')
     url.searchParams.append('secret', RECAPTCHA_SECRET_KEY)
     url.searchParams.append('response', token)
