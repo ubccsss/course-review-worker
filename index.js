@@ -89,10 +89,23 @@ async function handleRequest(request) {
   }
 
   // create issue
-  const { course, user, review, reference } = json.details
+  const { course, user, review, reference, difficulty, overall } = json.details
+
 
   const title = `New review for ${course} by ${user}`
-  const body = `> ${review}\n> \n> [${user}](${reference})`
+  let body = `> ${review}\n>\n`
+
+  const parsedDifficulty = parseFloat(difficulty)
+  if (!isNaN(parsedDifficulty)) {
+    body += `> Difficulty: ${parsedDifficulty}/5\n`
+  }
+
+  const parsedOverall = parseFloat(overall)
+  if (!isNaN(parsedOverall)) {
+    body += `> Overall: ${parsedOverall}/5\n`
+  }
+
+  body += `> <cite><a href="${reference}">${user}</a>, ${new Date().toDateString().split(" ").slice(1).join(" ")}</cite>`
 
   const response = await octokit.rest.issues.create({
     owner: OWNER,
