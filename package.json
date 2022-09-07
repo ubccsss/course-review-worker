@@ -1,8 +1,8 @@
 {
   "private": true,
   "name": "github-issues-worker",
-  "version": "1.0.0",
-  "description": "A Cloudflare worker for creating GitHub issues for new course reviews for ubccsss.org's courses database.",
+  "version": "1.1.0",
+  "description": "A Cloudflare worker for creating GitHub issues for new course reviews for ubccsss.org's course reviews database.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
