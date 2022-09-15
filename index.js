@@ -97,12 +97,14 @@ async function handleRequest(request) {
 
   const parsedDifficulty = parseFloat(difficulty)
   if (!isNaN(parsedDifficulty)) {
-    body += `> Difficulty: ${parsedDifficulty}/5\n`
+    const clampedDifficulty = Math.min(Math.max(1, parsedDifficulty), 5)
+    body += `> Difficulty: ${clampedDifficulty}/5\n`
   }
 
   const parsedOverall = parseFloat(overall)
   if (!isNaN(parsedOverall)) {
-    body += `> Overall: ${parsedOverall}/5\n`
+    const clampedOverall = Math.min(Math.max(1, parsedOverall), 5)
+    body += `> Overall: ${clampedOverall}/5\n`
   }
 
   body += `> <cite><a href="${reference}">${user}</a>, ${new Date().toDateString().split(" ").slice(1).join(" ")}</cite>`
