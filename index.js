@@ -91,23 +91,46 @@ async function handleRequest(request) {
   // create issue
   const { course, user, review, reference, difficulty, overall } = json.details
 
-
   const title = `New review for ${course} by ${user}`
   let body = `> ${review}\n>\n`
 
   const parsedDifficulty = parseFloat(difficulty)
+  let clampedDifficulty = 0
   if (!isNaN(parsedDifficulty)) {
-    const clampedDifficulty = Math.min(Math.max(1, parsedDifficulty), 5)
+    clampedDifficulty = Math.min(Math.max(1, parsedDifficulty), 5)
     body += `> Difficulty: ${clampedDifficulty}/5\n`
   }
 
   const parsedOverall = parseFloat(overall)
+  let clampedOverall = 0
   if (!isNaN(parsedOverall)) {
-    const clampedOverall = Math.min(Math.max(1, parsedOverall), 5)
+    clampedOverall = Math.min(Math.max(1, parsedOverall), 5)
     body += `> Overall: ${clampedOverall}/5\n`
   }
 
-  body += `> <cite><a href="${reference}">${user}</a>, ${new Date().toDateString().split(" ").slice(1).join(" ")}</cite>`
+  body += `> <cite><a href="${reference}">${user}</a>, ${new Date()
+    .toDateString()
+    .split(' ')
+    .slice(1)
+    .join(' ')}</cite>`
+
+  let yaml = `- author: ${user}\n  authorLink: ${reference}\n  date: ${new Date().getUTCFullYear()}-${(
+    new Date().getUTCMonth() + 1
+  )
+    .toString()
+    .padStart(2, '0')}-${new Date()
+    .getUTCDate()
+    .toString()
+    .padStart(2, '0')}\n  review: |\n    ${review.replaceAll('\n', '\n    ')}`
+
+  if (clampedDifficulty) {
+    yaml += `\n  difficulty: ${clampedDifficulty}`
+  }
+  if (clampedOverall) {
+    yaml += `\n  quality: ${clampedOverall}`
+  }
+
+  body += `\n<details><summary>View YAML to copy</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
 
   const response = await octokit.rest.issues.create({
     owner: OWNER,
