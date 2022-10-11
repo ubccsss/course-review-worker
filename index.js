@@ -89,7 +89,7 @@ async function handleRequest(request) {
   }
 
   // create issue
-  const { course, user, review, reference, difficulty, overall } = json.details
+  const { course, user, review, reference, difficulty, quality } = json.details
 
   const title = `New review for ${course} by ${user}`
   let body = `> ${review}\n>\n`
@@ -101,11 +101,11 @@ async function handleRequest(request) {
     body += `> Difficulty: ${clampedDifficulty}/5\n`
   }
 
-  const parsedOverall = parseFloat(overall)
-  let clampedOverall = 0
-  if (!isNaN(parsedOverall)) {
-    clampedOverall = Math.min(Math.max(1, parsedOverall), 5)
-    body += `> Overall: ${clampedOverall}/5\n`
+  const parsedQuality = parseFloat(quality)
+  let clampedQuality = 0
+  if (!isNaN(parsedQuality)) {
+    clampedQuality = Math.min(Math.max(1, parsedQuality), 5)
+    body += `> Quality: ${clampedQuality}/5\n`
   }
 
   body += `> <cite><a href="${reference}">${user}</a>, ${new Date()
@@ -126,8 +126,8 @@ async function handleRequest(request) {
   if (clampedDifficulty) {
     yaml += `\n  difficulty: ${clampedDifficulty}`
   }
-  if (clampedOverall) {
-    yaml += `\n  quality: ${clampedOverall}`
+  if (clampedQuality) {
+    yaml += `\n  quality: ${clampedQuality}`
   }
 
   body += `\n<details><summary>View YAML to copy</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
