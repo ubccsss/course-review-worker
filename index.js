@@ -120,7 +120,7 @@ async function handleRequest(request) {
     .toDateString()
     .split(' ')
     .slice(1)
-    .join(' ')}, taken ${sessionTaken}</cite>`
+    .join(' ')}, course taken during ${sessionTaken}</cite>`
 
   let yaml = `- author: ${user}\n  authorLink: ${reference}\n  date: ${new Date().getUTCFullYear()}-${(
     new Date().getUTCMonth() + 1
