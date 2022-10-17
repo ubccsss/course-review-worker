@@ -89,7 +89,15 @@ async function handleRequest(request) {
   }
 
   // create issue
-  const { course, user, review, reference, difficulty, quality } = json.details
+  const {
+    course,
+    user,
+    review,
+    reference,
+    difficulty,
+    quality,
+    sessionTaken,
+  } = json.details
 
   const title = `New review for ${course} by ${user}`
   let body = `> ${review}\n>\n`
@@ -112,7 +120,7 @@ async function handleRequest(request) {
     .toDateString()
     .split(' ')
     .slice(1)
-    .join(' ')}</cite>`
+    .join(' ')}, course taken during ${sessionTaken}</cite>`
 
   let yaml = `- author: ${user}\n  authorLink: ${reference}\n  date: ${new Date().getUTCFullYear()}-${(
     new Date().getUTCMonth() + 1
@@ -129,6 +137,8 @@ async function handleRequest(request) {
   if (clampedQuality) {
     yaml += `\n  quality: ${clampedQuality}`
   }
+
+  yaml += `\n  sessionTaken: ${sessionTaken}`
 
   body += `\n<details><summary>View YAML to copy</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
 
