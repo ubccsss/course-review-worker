@@ -1,12 +1,12 @@
-# 👷 GitHub issues worker
+# 👷 Course review worker
 
-A Cloudflare worker for creating GitHub issues for new course reviews for [ubccsss.org's](https://github.com/ubccsss/ubccsss.org) courses database. Reviews are verified using reCAPTCHA.
+A Cloudflare worker for creating GitHub PRs for new course reviews for [ubccsss.org's](https://github.com/ubccsss/ubccsss.org) courses database. Reviews are verified using reCAPTCHA.
 
 ## Getting Started
 
 ```bash
 $ git clone
-$ cd github-issues-worker
+$ cd course-review-worker
 $ npm install
 $ npm i @cloudflare/wrangler -g
 $ wrangler login  # select y to login via browser
@@ -21,9 +21,13 @@ $ wrangler login  # select y to login via browser
 
 Below are the environment variables that are used by the worker. Each one of them has a value for production and development. They can be set in [`wrangler.toml`](wrangler.toml).
 
+- `ENVIRONMENT`: The environment the worker is running in
 - `OWNER` - owner of the GitHub repository
 - `REPO` - name of the GitHub repository
-- `LABELS` - comma-separated list of labels to apply to new issues
+- `BASE_BRANCH` - base branch of the GitHub repository
+- `USERS` - comma-separated list of user reviewers for the PR
+- `TEAMS` - comma-separated list of team reviewers for the PR
+- `LABELS` - comma-separated list of labels to apply to new PRs
 - `ORIGIN` - acceptable origin for requests to the worker
 
 ## Secrets
@@ -36,7 +40,7 @@ Secrets can be managed using [wrangler](https://developers.cloudflare.com/worker
 ## Example call
 
 ```javascript
-const issue = await fetch(WORKER_URL, {
+const pr = await fetch(WORKER_URL, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -49,13 +53,16 @@ const issue = await fetch(WORKER_URL, {
       course: course,
       user: user,
       review: review,
-      reference: reference,
+      reference: reference, 
+      difficulty: difficulty,
+      quality: quality,
+      sessionTaken: sessionTaken, 
     },
   }),
 })
 ```
 
-Complete exmample call with error handling [here](https://github.com/ubccsss/ubccsss.org/blob/master/assets/js/create-github-issue.js).
+Complete example call with error handling [here](https://github.com/ubccsss/ubccsss.org/blob/master/assets/js/create-github-pr.js).
 
 ## Contributing
 
