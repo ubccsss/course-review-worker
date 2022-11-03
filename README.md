@@ -14,26 +14,26 @@ $ wrangler login  # select y to login via browser
 
 ## Environments
 
-- Development: default
-- Production: `--env production`
+- Development : default
+- Production : `--env production`
 
 ## Environment Variables
 
 Below are the environment variables that are used by the worker. Each one of them has a value for production and development. They can be set in [`wrangler.toml`](wrangler.toml).
 
-- `ENVIRONMENT`: The environment the worker is running in
-- `OWNER` - owner of the GitHub repository
-- `REPO` - name of the GitHub repository
-- `BASE_BRANCH` - base branch of the GitHub repository
-- `USERS` - comma-separated list of user reviewers for the PR
-- `TEAMS` - comma-separated list of team reviewers for the PR
-- `LABELS` - comma-separated list of labels to apply to new PRs
-- `ORIGIN` - acceptable origin for requests to the worker
+- `ENVIRONMENT` : The environment the worker is running in
+- `OWNER` : owner of the GitHub repository
+- `REPO` : name of the GitHub repository
+- `BASE_BRANCH` : base branch of the GitHub repository
+- `USERS` : comma-separated list of user reviewers for the PR
+- `TEAMS` : comma-separated list of team reviewers for the PR
+- `LABELS` : comma-separated list of labels to apply to new PRs
+- `ORIGIN` : acceptable origin for requests to the worker
 
 ## Secrets
 
-- `ACCESS_TOKEN` - [GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-- `RECAPTCHA_SECRET_KEY` - [Google reCAPTCHA secret key](https://developers.google.com/recaptcha/intro)
+- `ACCESS_TOKEN` : [GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+- `RECAPTCHA_SECRET_KEY` : [Google reCAPTCHA secret key](https://developers.google.com/recaptcha/intro)
 
 Secrets can be managed using [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/commands#secret) or using the [Cloudflare dashboard](https://dash.cloudflare.com).
 
