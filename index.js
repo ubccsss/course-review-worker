@@ -210,17 +210,13 @@ async function handleRequest(request) {
 			labels: LABELS.split(','),
 		})
 
-		// In the production environment we want to ask for a review from the team
-		const reviewersArray = REVIEWERS.split(',')
-		const reviewers =
-			ENVIRONMENT === 'production' ? { team_reviewers: reviewersArray } : { reviewers: reviewersArray }
-
 		// request a review from the reviewers
 		await octokit.rest.pulls.requestReviewers({
 			owner: OWNER,
 			repo: REPO,
 			pull_number: newPR.data.number,
-			...reviewers,
+			reviewers: USERS.split(','),
+			team_reviewers: TEAMS.split(',')
 		})
 
 		// return the url of the new PR
