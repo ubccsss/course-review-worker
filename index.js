@@ -135,7 +135,7 @@ async function handleRequest(request) {
 
 	body += `\n<details><summary>View YAML for new review</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
 
-	body = body + 'This is an auto-generated PR made using: https://github.com/ubccsss/github-issues-worker\n'
+	body = body + 'This is an auto-generated PR made using: https://github.com/ubccsss/course-review-worker\n'
 
 	try {
 		// new branch name for the PR
