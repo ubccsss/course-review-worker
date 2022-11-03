@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/rest'
+import { Buffer } from 'buffer'
 
 const octokit = new Octokit({ auth: ACCESS_TOKEN })
 
@@ -53,7 +54,7 @@ function handleOptions(request) {
 }
 
 /**
- * Makes POST request to GitHub API and returns the response.
+ * Makes POST request to GitHub API to create a PR and returns the url of the PR.
  * @param {Request} request
  */
 async function handleRequest(request) {
@@ -88,16 +89,8 @@ async function handleRequest(request) {
 		})
 	}
 
-	// create issue
-	const {
-		course,
-		user,
-		review,
-		reference,
-		difficulty,
-		quality,
-		sessionTaken,
-	} = json.details
+	// create yaml string for the course review and PR body
+	const { course, user, review, reference, difficulty, quality, sessionTaken } = json.details
 
 	const title = `New review for ${course} by ${user}`
 	let body = `> ${review}\n>\n`
@@ -116,48 +109,138 @@ async function handleRequest(request) {
 		body += `> Quality: ${clampedQuality}/5\n`
 	}
 
-	body += `> <cite><a href="${reference}">${user}</a>, ${new Date()
+	body += `> <cite><a href='${reference}'>${user}</a>, ${new Date()
 		.toDateString()
 		.split(' ')
 		.slice(1)
 		.join(' ')}, course taken during ${sessionTaken}</cite>`
 
-	let yaml = `- author: ${user}\n  authorLink: ${reference}\n  date: ${new Date().getUTCFullYear()}-${(
+	let yaml = `  - author: ${user}\n    authorLink: ${reference}\n    date: ${new Date().getUTCFullYear()}-${(
 		new Date().getUTCMonth() + 1
 	)
 		.toString()
 		.padStart(2, '0')}-${new Date()
 		.getUTCDate()
 		.toString()
-		.padStart(2, '0')}\n  review: |\n    ${review.replaceAll('\n', '\n    ')}`
+		.padStart(2, '0')}\n    review: |\n      ${review.replaceAll('\n', '\n      ')}`
 
 	if (clampedDifficulty) {
-		yaml += `\n  difficulty: ${clampedDifficulty}`
+		yaml += `\n    difficulty: ${clampedDifficulty}`
 	}
 	if (clampedQuality) {
-		yaml += `\n  quality: ${clampedQuality}`
+		yaml += `\n    quality: ${clampedQuality}`
 	}
 
-	yaml += `\n  sessionTaken: ${sessionTaken}`
+	yaml += `\n    sessionTaken: ${sessionTaken}\n`
 
-	body += `\n<details><summary>View YAML to copy</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
+	body += `\n<details><summary>View YAML for new review</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
 
-	const response = await octokit.rest.issues.create({
-		owner: OWNER,
-		repo: REPO,
-		title: title,
-		body: body,
-		labels: LABELS.split(','),
-	})
+	body = body + 'This is an auto-generated PR made using: https://github.com/ubccsss/github-issues-worker\n'
 
-	return new Response(JSON.stringify({ url: response.data.html_url }), {
-		headers: {
-			status: 201,
-			statusText: 'Created',
+	try {
+		// new branch name for the PR
+		const newBranchName = `new-review-${Date.now()}`
+
+		// get ref for base branch
+		const baseBranchRef = await octokit.git.getRef({
+			owner: OWNER,
+			repo: REPO,
+			ref: `heads/${BASE_BRANCH}`,
+		})
+
+		// hash of last commit on base branch
+		const lastCommitSha = baseBranchRef.data.object.sha
+
+		// make a new branch from last commit on base branch
+		await octokit.rest.git.createRef({
+			owner: OWNER,
+			repo: REPO,
+			ref: `refs/heads/${newBranchName}`,
+			sha: lastCommitSha,
+		})
+
+		let fileSha = {}
+		try {
+			// get the file contents for the course review file
+			const existingReviews = await octokit.rest.repos.getContent({
+				owner: OWNER,
+				repo: REPO,
+				path: `data/courseReviews/${course.toLowerCase().replace(' ', '-')}.yaml`,
+				ref: `refs/heads/${newBranchName}`,
+			})
+
+			// if the file exists, we need to update it and to do that we need to get the sha of the file
+			fileSha = { sha: existingReviews.data.sha }
+
+			// if the file exists, we will append the new review to the existing reviews
+			// otherwise, we will create a new file with the new review
+			const existingReviewsContent = Buffer.from(existingReviews.data.content, 'base64').toString()
+			yaml = existingReviewsContent + yaml
+		} catch (e) {
+			// if the file doesn't exist, we will create a new file with the new review
+			yaml = 'reviews:\n' + yaml
+		}
+
+		// update or create the yaml file with the new review
+		await octokit.rest.repos.createOrUpdateFileContents({
+			owner: OWNER,
+			repo: REPO,
+			path: `data/courseReviews/${course.toLowerCase().replace(' ', '-')}.yaml`,
+			branch: newBranchName,
+			message: `Added new review for ${course}`,
+			content: btoa(yaml),
+			...fileSha,
+		})
+
+		// make a PR to merge the new branch into the base branch
+		const newPR = await octokit.rest.pulls.create({
+			owner: OWNER,
+			repo: REPO,
+			title: title,
+			body: body,
+			head: newBranchName,
+			base: BASE_BRANCH,
+		})
+
+		// add label to PR
+		await octokit.rest.issues.addLabels({
+			owner: OWNER,
+			repo: REPO,
+			issue_number: newPR.data.number,
+			labels: LABELS.split(','),
+		})
+
+		// In the production environment we want to ask for a review from the team
+		const reviewersArray = REVIEWERS.split(',')
+		const reviewers =
+			ENVIRONMENT === 'production' ? { team_reviewers: reviewersArray } : { reviewers: reviewersArray }
+
+		// request a review from the reviewers
+		await octokit.rest.pulls.requestReviewers({
+			owner: OWNER,
+			repo: REPO,
+			pull_number: newPR.data.number,
+			...reviewers,
+		})
+
+		// return the url of the new PR
+		return new Response(JSON.stringify({ url: newPR.data.html_url }), {
+			headers: {
+				status: 201,
+				statusText: 'Created',
+				'Content-Type': 'application/json',
+				...corsHeaders,
+			},
+		})
+	} catch (error) {
+		console.error(error.message)
+		return new Response(JSON.stringify(error), {
+			status: 500,
+			statusText: 'Internal Server Error',
 			'Content-Type': 'application/json',
 			...corsHeaders,
-		},
-	})
+		})
+	}
 }
 
 /**

@@ -9,8 +9,11 @@ workers_dev = true
 compatibility_date = "2022-09-07"
 
 [vars]
+ENVIRONMENT = "development"
 OWNER = "csssbot"
 REPO = "testing"
+BASE_BRANCH = "main"
+REVIEWERS = "AnimeAllstar"
 LABELS = "test,octokit"
 ORIGIN = "*"
 
@@ -18,7 +21,10 @@ ORIGIN = "*"
 name = "githubissues"
 
 [env.production.vars]
+ENVIRONMENT = "production"
 OWNER = "ubccsss"
 REPO = "ubccsss.org"
+BASE_BRANCH = "master"
+REVIEWERS = "website"
 LABELS = "course review"
 ORIGIN = "https://ubccsss.org"
