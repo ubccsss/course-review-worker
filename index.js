@@ -174,8 +174,10 @@ async function handleRequest(request) {
 
 			// if the file exists, we will append the new review to the existing reviews
 			// otherwise, we will create a new file with the new review
-			const existingReviewsContent = Buffer.from(existingReviews.data.content, 'base64').toString()
-			yaml = existingReviewsContent + yaml
+			const existingReviewsContent = Buffer.from(existingReviews.data.content, 'base64')
+				.toString()
+				.replace('reviews:\n', '')
+			yaml = 'reviews:\n' + yaml + existingReviewsContent
 		} catch (e) {
 			// if the file doesn't exist, we will create a new file with the new review
 			yaml = 'reviews:\n' + yaml
@@ -216,7 +218,7 @@ async function handleRequest(request) {
 			repo: REPO,
 			pull_number: newPR.data.number,
 			reviewers: USERS.split(','),
-			team_reviewers: TEAMS.split(',')
+			team_reviewers: TEAMS.split(','),
 		})
 
 		// return the url of the new PR

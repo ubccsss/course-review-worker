@@ -5,6 +5,7 @@ type = "webpack"
 
 account_id = "f8ffb577efdf82b0303f86d7b4ca94a5"
 workers_dev = true
+node_compat = true
 
 compatibility_date = "2022-09-07"
 
