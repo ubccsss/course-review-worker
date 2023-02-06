@@ -90,7 +90,7 @@ async function handleRequest(request) {
 	}
 
 	// create yaml string for the course review and PR body
-	const { course, user, review, reference, difficulty, quality, sessionTaken } = json.details
+	const { course, user, review, reference, difficulty, quality, sessionTaken, email } = json.details
 
 	const title = `New review for ${course} by ${user}`
 	let body = `> ${review}\n>\n`
@@ -134,6 +134,8 @@ async function handleRequest(request) {
 	yaml += `\n    sessionTaken: ${sessionTaken}\n`
 
 	body += `\n<details><summary>View YAML for new review</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
+
+	body += `\n<details><summary>View raffle email</summary>\n${email}\nRemember to edit this out (… > 'Edit') after processing the review.\n</details>`
 
 	body = body + 'This is an auto-generated PR made using: https://github.com/ubccsss/course-review-worker\n'
 
