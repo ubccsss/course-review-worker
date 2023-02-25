@@ -135,7 +135,9 @@ async function handleRequest(request) {
 
 	body += `\n<details><summary>View YAML for new review</summary>\n<pre>\n${yaml}\n<\pre>\n</details>`
 
-	body += `\n<details><summary>View raffle email</summary>\n${email}\nRemember to edit this out (… > 'Edit') after processing the review.\n</details>`
+	if (email) {
+		body += `\n<details><summary>View raffle email</summary>\n${email}\nRemember to edit this out (… > 'Edit') after processing the review.\n</details>`
+	}
 
 	body = body + 'This is an auto-generated PR made using: https://github.com/ubccsss/course-review-worker\n'
 
@@ -192,7 +194,7 @@ async function handleRequest(request) {
 			path: `data/courseReviews/${course.toLowerCase().replace(' ', '-')}.yaml`,
 			branch: newBranchName,
 			message: `Added new review for ${course}`,
-			content: btoa(yaml),
+			content: Buffer.from(yaml).toString('base64'),
 			...fileSha,
 		})
 
@@ -214,14 +216,16 @@ async function handleRequest(request) {
 			labels: LABELS.split(','),
 		})
 
-		// request a review from the reviewers
-		await octokit.rest.pulls.requestReviewers({
-			owner: OWNER,
-			repo: REPO,
-			pull_number: newPR.data.number,
-			reviewers: USERS.split(','),
-			team_reviewers: TEAMS.split(','),
-		})
+		if (TEAMS.split(',').length != 0) {
+			// request a review from the reviewers
+			await octokit.rest.pulls.requestReviewers({
+				owner: OWNER,
+				repo: REPO,
+				pull_number: newPR.data.number,
+				reviewers: USERS.split(','),
+				team_reviewers: TEAMS.split(','),
+			})
+		}
 
 		// return the url of the new PR
 		return new Response(JSON.stringify({ url: newPR.data.html_url }), {
